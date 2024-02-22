@@ -4,5 +4,5 @@ import { SortBy } from './sort-by.enum';
 export class GetUsersQuery {
   @IsOptional()
   @IsEnum(SortBy)
-  created: SortBy;
+  created?: SortBy;
 }

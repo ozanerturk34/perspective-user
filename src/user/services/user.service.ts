@@ -6,6 +6,11 @@ import { GetUsersQuery } from '../models/get-users-query.model';
 
 @Injectable()
 export class UserService {
+  /**
+   * Create User
+   * @param {CreateUserDto} createUserDto - User data
+   * @returns {Promise<UserDto>} Returns the created user
+   */
   async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
     const user: UserDto = {
       id: 1,
@@ -14,7 +19,12 @@ export class UserService {
     return user;
   }
 
-  async getUsers(getUsersQuery: GetUsersQuery): Promise<UserDto[]> {
+  /**
+   * Retrieve Users
+   * @param {GetUsersQuery} getUsersQuery - Query parameters including created: "asc" | "desc"
+   * @returns {Promise<UserDto>} Returns all existing users
+   */
+  async getUsers(getUsersQuery?: GetUsersQuery): Promise<UserDto[]> {
     console.log('getUsersQuery', getUsersQuery);
     const users: UserDto[] = [
       {

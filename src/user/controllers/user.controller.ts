@@ -7,6 +7,7 @@ import { GetUsersQuery } from '../models/get-users-query.model';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+
   @Post('create')
   createUser(@Body() createUserDto: CreateUserDto): Promise<UserDto> {
     return this.userService.createUser(createUserDto);
