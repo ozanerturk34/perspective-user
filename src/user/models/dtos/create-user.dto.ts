@@ -4,16 +4,20 @@ import {
   IsNotEmpty,
   IsPositive,
   IsString,
+  MaxLength,
 } from 'class-validator';
-import { UserGender } from './user-gender.enum';
+
+import { UserGender } from '../types/user-gender.enum';
 
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   username: string;
 
   @IsString()
   @IsNotEmpty()
+  @MaxLength(100)
   fullName: string;
 
   @IsInt()

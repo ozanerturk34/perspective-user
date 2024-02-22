@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { UserService } from './user.service';
-import { UserGender } from '../models/user-gender.enum';
+import { UserGender } from '../models/types/user-gender.enum';
 
 describe('UserService', () => {
   let service: UserService;

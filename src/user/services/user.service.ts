@@ -1,22 +1,25 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from '../models/create-user.dto';
-import { UserDto } from '../models/user.dto';
-import { UserGender } from '../models/user-gender.enum';
-import { GetUsersQuery } from '../models/get-users-query.model';
+import { InjectRepository } from '@nestjs/typeorm';
+
+import { CreateUserDto } from '../models/dtos/create-user.dto';
+import { UserDto } from '../models/dtos/user.dto';
+import { GetUsersQuery } from '../models/types/get-users-query.model';
+import { UserRepository } from '../models/entities/user.repository';
+import { User } from '../models/entities/user.entity';
 
 @Injectable()
 export class UserService {
+  constructor(
+    @InjectRepository(UserRepository) private userRepository: UserRepository,
+  ) {}
   /**
    * Create User
    * @param {CreateUserDto} createUserDto - User data
    * @returns {Promise<UserDto>} Returns the created user
    */
   async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
-    const user: UserDto = {
-      id: 1,
-      ...createUserDto,
-    };
-    return user;
+    const user = await this.userRepository.createUser(createUserDto);
+    return this.mapUserToUserDto(user);
   }
 
   /**
@@ -25,23 +28,21 @@ export class UserService {
    * @returns {Promise<UserDto>} Returns all existing users
    */
   async getUsers(getUsersQuery?: GetUsersQuery): Promise<UserDto[]> {
-    console.log('getUsersQuery', getUsersQuery);
-    const users: UserDto[] = [
-      {
-        id: 1,
-        fullName: 'John Doe',
-        username: 'john_doe',
-        gender: UserGender['male'],
-        age: 25,
-      },
-      {
-        id: 2,
-        fullName: 'Jane Doe',
-        username: 'jane_doe',
-        gender: UserGender['female'],
-        age: 20,
-      },
-    ];
-    return users;
+    const users = await this.userRepository.getUsers(getUsersQuery?.created);
+    return this.mapUsersToUserDtos(users);
+  }
+
+  private mapUsersToUserDtos(users: User[]): UserDto[] {
+    return users.map((user) => this.mapUserToUserDto(user));
+  }
+
+  private mapUserToUserDto({
+    id,
+    username,
+    fullName,
+    age,
+    gender,
+  }: User): UserDto {
+    return { id, username, fullName, age, gender };
   }
 }

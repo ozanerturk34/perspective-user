@@ -1,4 +1,4 @@
-import { UserGender } from './user-gender.enum';
+import { UserGender } from '../types/user-gender.enum';
 
 export class UserDto {
   id: number;
