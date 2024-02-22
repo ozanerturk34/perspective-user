@@ -7,14 +7,15 @@ import {
 } from 'typeorm';
 
 import { UserGender } from '../types/user-gender.enum';
+import { Matches } from 'class-validator';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Index({ unique: true })
-  @Column({ type: 'varchar', length: 100 })
+  @Matches(/^[a-zA-Z0-9]+$/)
+  @Column({ type: 'varchar', length: 100, unique: true })
   username: string;
 
   @Column({ type: 'varchar', length: 100 })
@@ -27,5 +28,6 @@ export class User {
   gender: UserGender;
 
   @CreateDateColumn({ type: 'timestamp' })
+  @Index()
   createdAt: Date;
 }

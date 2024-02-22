@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { CreateUserDto } from '../models/dtos/create-user.dto';
@@ -18,8 +22,15 @@ export class UserService {
    * @returns {Promise<UserDto>} Returns the created user
    */
   async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
-    const user = await this.userRepository.createUser(createUserDto);
-    return this.mapUserToUserDto(user);
+    try {
+      const user = await this.userRepository.createUser(createUserDto);
+      return this.mapUserToUserDto(user);
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('Username already exists');
+      }
+      throw new InternalServerErrorException();
+    }
   }
 
   /**
