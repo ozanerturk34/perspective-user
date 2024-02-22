@@ -1,73 +1,205 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Perspective User API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+![TypeScript](https://img.shields.io/badge/-TypeScript-black?style=for-the-badge&logoColor=white&logo=typescript&color=2F73BF)
+![Nest](https://img.shields.io/badge/-NestJs-black?style=for-the-badge&logo=nestjs&color=E0234D)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 📋 Table of Contents
 
-## Description
+1. 👀 [What is this API ?](#what-is-this-api)
+2. 📂 [File Structure](#file-structure)
+3. 🔨 [Installation](#installation)
+4. 🚀 [Build](#build)
+5. 🐳 [Docker](#docker)
+6. 💯 [Tests](#tests)
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## <a name="what-is-this-api">👀 What is this API ?</a>
 
-## Installation
+A **[NestJS](http://nestjs.com/)** based API to manage users for **[Perspective](https://www.perspective.co/)**
 
-```bash
-$ yarn install
+Functionalities include:
+
+- Getting list of all users registered to the system
+- Getting the list of users via ascending or descending order in terms of creation date
+- Creating single user
+
+### API Gateways
+
+- **GET /user**
+
+  - **GET /user?created=asc**
+  - **GET /user?created=desc**
+
+- **POST /user/create**
+
+### Main Components
+
+#### UserController (user.controller.ts)
+
+- Defines two endpoints
+- Uses DTOs (`CreateUserDto` and `UserDto`) to ensure type safety and validation
+- Relies on the `UserService` to handle the business logic.
+
+#### UserService (user.service.ts)
+
+- Interacts with the `UserRepository` to perform database operations, abstracting the logic away from the controller.
+- Uses exception handling to handle unique constraint violation for `username`.
+
+#### UserRepository (user.repository.ts)
+
+- Extends `Repository<User>` from `TypeORM`, customized with additional methods for creating and fetching users.
+- Makes use of the `DataSource` to create an entity manager for executing operations on the `User` entity.
+
+#### User Entity (user.entity.ts)
+
+- Maps to a database table using `TypeORM` decorators, defining columns for user properties and an index for the createdAt column to optimize queries.
+- Includes validation for the `username` field using the `class-validator` library to ensure only alphanumeric characters are allowed.
+
+## <a name="file-structure">📂 File Structure</a>
+
+```
+.
+├── src
+│   ├── app.module.ts            # Root application module
+│   ├── main.ts                  # Application entry file
+│   └── user                     # User feature module
+│       ├── controllers          # User controllers
+│       │   ├── user.controller.ts           # User requests handler
+│       │   └── user.controller.spec.ts      # Tests for user.controller
+│       ├── models               # Data models and DTOs
+│       │   ├── dtos             # Data Transfer Objects
+│       │   │   ├── create-user.dto.ts       # DTO for new user
+│       │   │   └── user.dto.ts              # General user DTO
+│       │   ├── entities         # Database entities
+│       │   │   ├── user.entity.ts           # User database entity
+│       │   │   └── user.repository.ts       # User operations repository
+│       │   └── types            # Custom types and enums
+│       │       ├── get-users-query.model.ts # Query params model
+│       │       ├── sort-by.enum.ts          # Sorting parameter enum
+│       │       └── user-gender.enum.ts      # User gender enum
+│       └── services             # Business logic services
+│           ├── user.service.ts              # User-related operations
+│           └── user.service.spec.ts         # Tests for user.service
+├── test                         # Test configurations
+│   ├── app.e2e-spec.ts          # E2E tests for application
+│   └── jest-e2e.json            # Jest config for e2e tests
+└── ...
 ```
 
-## Running the app
+## <a name="installation">🔨 Installation</a>
 
-```bash
-# development
-$ yarn run start
+To install this project, you will need to have on your machine :
 
-# watch mode
-$ yarn run start:dev
+![Node](https://img.shields.io/badge/-nodejs-black?style=for-the-badge&logoColor=white&logo=node.js&color=366A31)
+![Docker](https://img.shields.io/badge/-Docker-black?style=for-the-badge&logoColor=white&logo=docker&color=004EA2)
 
-# production mode
-$ yarn run start:prod
+I recommend to use the node version specified in the `.nvmrc` file.
+
+**If you don't have `yarn` installed, you can still use `npm` for all commands below**
+
+Before running the you will need to create a local postgres in this destination:
+
+```type: 'postgres',
+host: 'localhost',
+port: 5432,
+username: 'postgres',
+password: 'mysecretpassword',
+database: 'postgres'
 ```
 
-## Test
+You can also rearrange the config info for the database in `app.module.ts`
+
+I suggest docker to create and maintain the database. For more information go to **[Docker section](#docker)**
+
+Then, run the following commands :
+
+```bash
+# Install dependencies
+yarn install
+
+# Run the app in dev mode
+yarn start
+
+# Run the app in watch mode
+yarn start:dev
+```
+
+## <a name="build">🚀 Build</a>
+
+In order to build the app for production, run the following command :
+
+```bash
+# Build the app
+yarn build
+
+# Run the app in production mode
+yarn start:prod
+```
+
+## <a name="docker">🐳 Docker</a>
+
+Arguably, easiest and most convenient way to create local database is with docker
+
+Generally, **[docker's own postgres guide](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)** is very good.
+
+Follow that to install docker and dashboard for better visibility
+
+In order to get the postgres template for docker, run the following command :
+
+```bash
+# I suggest using postgres version < 16 due
+# TypeORM is not compatible with postgres@16.0 or above
+
+docker pull postgres:14.5
+```
+
+Then run the following command to create the database. Make sure `docker` app is on :
+
+```bash
+# Change the config values as needed
+docker run --name perspective-user-api -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres:14.5
+```
+
+**Now you should be able to start the app in dev mode and database template should be automatically migrated via typeORM**
+
+## <a name="tests">💯 Tests</a>
+
+Business logic related part of the app hs 100% unit test coverage
+
+### Unit Tests
+
+#### User Controller and Service Tests:
+
+- The ability to create a new user
+- Retrieve a list of users.
+- Proper handling of unique constraint violations when attempting to create a user with an existing username.
+
+`UserRepository` is mocked for these tests
+
+### End-to-End (E2E) Tests
+
+#### Application Flow Tests:
+
+Making HTTP requests to the user endpoints to:
+
+- create a new user
+- retrieve users
+
+Using `NestJS` helpers to create a mock server via `supertest` and mocking the `UserService` to not effect actual database data
+
+### Testing Frameworks and Tools
+
+- Jest for main testing framework
+- Supertest for E2E test to mock HTTP
+
+To run the tests, use the following commands :
 
 ```bash
 # unit tests
-$ yarn run test
+$ yarn test
 
 # e2e tests
-$ yarn run test:e2e
+$ yarn test:e2e
 
 # test coverage
-$ yarn run test:cov
+$ yarn test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).

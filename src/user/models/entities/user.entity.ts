@@ -14,7 +14,7 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Matches(/^[a-zA-Z0-9]+$/)
+  @Matches(/^[a-zA-Z0-9_]+$/)
   @Column({ type: 'varchar', length: 100, unique: true })
   username: string;
 
