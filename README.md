@@ -31,6 +31,16 @@ Functionalities include:
 
 - **POST /user/create**
 
+Expected payload for post request to create user can be found on [create-user.dto.ts](https://github.com/ozanerturk34/perspective-user/blob/main/src/user/models/dtos/create-user.dto.ts)
+
+```bash
+# Create User Payload Structure
+ username: string  # Only alphanumeric characters with max char limit 100
+ fullName: string # With max char limit 100
+ age: number # positive integer
+ gender: "male" | "female" | "other" # enum
+```
+
 ### Main Components
 
 #### UserController (user.controller.ts)
