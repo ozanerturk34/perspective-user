@@ -104,9 +104,13 @@ To install this project, you will need to have on your machine :
 
 I recommend to use the node version specified in the `.nvmrc` file.
 
+Modify ".env.example" file with desired values and rename it to `.env`. `TypeORM` and `Nest` will automatically load the environmental variables on start via `dotenv`.
+
 **If you don't have `yarn` installed, you can still use `npm` for all commands below**
 
-Before running the you will need to create a local postgres in this destination:
+### Development
+
+Before running the node server you will need to create a local postgres in this destination:
 
 ```type: 'postgres',
 host: 'localhost',
@@ -115,8 +119,6 @@ username: 'postgres',
 password: 'mysecretpassword',
 database: 'postgres'
 ```
-
-You can also rearrange the config info for the database in `app.module.ts`
 
 I suggest docker to create and maintain the database. For more information go to **[Docker section](#docker)**
 
@@ -133,6 +135,18 @@ yarn start
 yarn start:dev
 ```
 
+### Staging
+
+To mimic the production, we can create docker containers for node, postgres and pgAdmin4 via `Dockerfile` and `docker-compose.yml`
+
+Start Docker app and then run
+
+```bash
+yarn start:docker
+```
+
+3 distinct docker containers will be launched and app will be available on `localhost:{API_PORT}`. `API_PORT` can be set in `.env`
+
 ## <a name="build">🚀 Build</a>
 
 In order to build the app for production, run the following command :
@@ -147,7 +161,9 @@ yarn start:prod
 
 ## <a name="docker">🐳 Docker</a>
 
-Arguably, easiest and most convenient way to create local database is with docker
+### Development
+
+Arguably, easiest and most convenient way to create local database is with docker.
 
 Generally, **[docker's own postgres guide](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)** is very good.
 
@@ -156,20 +172,41 @@ Follow that to install docker and dashboard for better visibility
 In order to get the postgres template for docker, run the following command :
 
 ```bash
-# I suggest using postgres version < 16 due
-# TypeORM is not compatible with postgres@16.0 or above
-
-docker pull postgres:14.5
+docker pull postgres:16-alpine
 ```
 
 Then run the following command to create the database. Make sure `docker` app is on :
 
 ```bash
 # Change the config values as needed
-docker run --name perspective-user-api -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres:14.5
+docker run --name perspective-user-db -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres:16-alpine
 ```
 
 **Now you should be able to start the app in dev mode and database template should be automatically migrated via typeORM**
+
+### Staging
+
+It also make sense to use docker to create a local staging environment using docker to containerize the api, database and database admin interface.
+
+```bash
+# To run the docker-compose.yml
+yarn start:docker # -> docker compose -d up
+
+# To rebuild the images after change
+yarn build:docker # -> docker build -t perspective-user-app
+```
+
+App will be available at `localhost:{API_PORT}` as mentioned in <a name="installation">installation</a> chapter.
+
+### Production
+
+Putting the project into actual production is out of scope but docker pipeline created here is perfectly capable of being used to create remote services.
+
+- Create a CI/CD pipeline
+- Create docker container in a remote service provider like AWS in the CI/CD pipeline
+- AWS EKS is a great tool for that
+- Combine that with a kubernetes cluster for ultimate scaling
+- Use a code as infrastructure service like terraform to manage remote assets
 
 ## <a name="tests">💯 Tests</a>
 
